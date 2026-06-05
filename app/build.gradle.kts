@@ -1,56 +1,107 @@
+// File: App-Level build.gradle.kts
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
     namespace = "com.iqodist"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.iqodist"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // ===== CORE =====
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
+    implementation("androidx.activity:activity-compose:1.10.1")
+
+    // ===== COMPOSE (UI) =====
+    implementation(platform("androidx.compose:compose-bom:2025.05.01"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // ===== LIFECYCLE & VIEWMODEL =====
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+
+    // ===== NAVIGATION =====
+    implementation("androidx.navigation:navigation-compose:2.8.9")
+
+    // ===== ROOM DATABASE (Fitur Offline) =====
+    implementation("androidx.room:room-runtime:2.7.1")
+    implementation("androidx.room:room-ktx:2.7.1")
+    ksp("androidx.room:room-compiler:2.7.1")
+
+    // ===== HILT (Dependency Injection) =====
+    // [PERBAIKAN 1] Samakan versi dengan Project-Level (2.51.1)
+    // [PERBAIKAN 2] Hilt sekarang sudah fully support KSP, jadi gunakan ksp()!
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    ksp("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // ===== RETROFIT & OKHTTP (Fitur Online API) =====
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // ===== KOTLIN SERIALIZATION =====
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+
+    // ===== COROUTINES =====
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+
+    // ===== LOGGING =====
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // ===== TESTING =====
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2025.05.01"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
