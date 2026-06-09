@@ -80,7 +80,7 @@ object NetworkModule {
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://bullpen-vagrancy-sanitary.ngrok-free.dev/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             // Converter: ubah JSON dari server menjadi data class Kotlin (dan sebaliknya)
             .addConverterFactory(
