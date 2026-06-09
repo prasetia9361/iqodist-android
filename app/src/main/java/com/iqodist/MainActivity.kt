@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
                 AppNavGraph(
                     navController  = navController,
                     sessionManager = sessionManager
-
                 )
             }
         }

@@ -1,4 +1,5 @@
 // App-level build.gradle.kts
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +20,16 @@ android {
         versionCode             = 1
         versionName             = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) {
+            localProps.load(localPropsFile.inputStream())
+        }
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${localProps.getProperty("BASE_URL", "https://api.example.com/")}\""
+        )
     }
 
     buildTypes {

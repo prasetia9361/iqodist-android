@@ -15,10 +15,8 @@ private val Context.dataStore: DataStore<Preferences>
     by preferencesDataStore(name = "iqodist_session")
 
 @Singleton
-class SessionManager @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
-
+class SessionManager @Inject constructor( @ApplicationContext private val context: Context)
+{
     suspend fun saveSession(
         accessToken: String,
         refreshToken: String,
@@ -50,4 +48,7 @@ class SessionManager @Inject constructor(
 
     val accessToken: Flow<String?> = context.dataStore.data
         .map { prefs -> prefs[SessionKeys.ACCESS_TOKEN] }
+
+    val userName: Flow<String?> = context.dataStore.data
+        .map { prefs -> prefs[SessionKeys.USER_NAME] }
 }

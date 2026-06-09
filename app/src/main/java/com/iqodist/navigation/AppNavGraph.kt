@@ -14,28 +14,19 @@ import com.iqodist.feature.pos.presentation.PosScreen
 import com.iqodist.feature.sfa.presentation.SfaScreen
 
 @Composable
-fun AppNavGraph(
-    navController: NavHostController,
-    sessionManager: SessionManager
-) {
-    // Cek status login — reactive, otomatis redirect saat logout
-    val isLoggedIn by sessionManager.isLoggedIn
-        .collectAsStateWithLifecycle(initialValue = false)
+fun AppNavGraph(navController: NavHostController, sessionManager: SessionManager)
+{
+    val isLoggedIn by sessionManager.isLoggedIn.collectAsStateWithLifecycle(initialValue = false)
 
     val startDestination = if (isLoggedIn) Route.Dashboard.path
                            else            Route.Login.path
 
-    NavHost(
-        navController    = navController,
-        startDestination = startDestination
-    ) {
-
+    NavHost(navController    = navController, startDestination = startDestination)
+    {
         // ── Auth ──────────────────────────────────────────────────────────
         composable(Route.Login.path) {
             LoginScreen(
-                onLoginSuccess = { role ->
-                    // Arahkan ke Dashboard dan hapus Login dari back stack
-                    navController.navigate(Route.Dashboard.path) {
+                onLoginSuccess = { role -> navController.navigate(Route.Dashboard.path) {
                         popUpTo(Route.Login.path) { inclusive = true }
                     }
                 }
