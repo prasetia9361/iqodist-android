@@ -69,10 +69,6 @@ object NetworkModule {
             .build()
     }
 
-    /**
-     * Menyediakan Retrofit — library yang mengubah interface Kotlin
-     * menjadi HTTP request secara otomatis.
-     */
     @Provides
     @Singleton
     fun provideRetrofit(
@@ -82,16 +78,11 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
-            // Converter: ubah JSON dari server menjadi data class Kotlin (dan sebaliknya)
             .addConverterFactory(
                 json.asConverterFactory("application/json; charset=UTF-8".toMediaType())
             )
             .build()
     }
-    /**
-     * Menyediakan AuthApiService.
-     * Retrofit.create() membuat implementasi otomatis dari interface AuthApiService.
-     */
     @Provides
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {

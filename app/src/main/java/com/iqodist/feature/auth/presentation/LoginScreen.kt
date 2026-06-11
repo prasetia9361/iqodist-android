@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onLoginSuccess: (role: String) -> Unit,
@@ -31,6 +29,8 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
+
+    var dropdownExpanded by remember {mutableStateOf(false)}
 
     LaunchedEffect(uiState) {
         if (uiState is LoginUiState.Success) {
@@ -66,7 +66,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // ── Field Username ───────────────────────────────────────────
             OutlinedTextField(
                 value         = viewModel.username,
                 onValueChange = viewModel::onUsernameChange,
@@ -91,7 +90,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ── Field Password ───────────────────────────────────────────
             OutlinedTextField(
                 value         = viewModel.password,
                 onValueChange = viewModel::onPasswordChange,
@@ -107,9 +105,9 @@ fun LoginScreen(
                     IconButton(onClick = viewModel::toggelPasswordVisibility) {
                         Icon(
                             imageVector = if (viewModel.isPasswordVisible)
-                                Icons.Default.Lock
+                                Icons.Default.VisibilityOff
                             else
-                                Icons.Default.Search,
+                                Icons.Default.Visibility,
                             contentDescription = if (viewModel.isPasswordVisible)
                                 "Sembunyikan password"
                             else
@@ -136,8 +134,52 @@ fun LoginScreen(
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(12.dp))
 
-            // ── Pesan Error ──────────────────────────────────────────────
+            ExposedDropdownMenuBox(
+                expanded  = dropdownExpanded,
+                onExpandedChange = { dropdownExpanded = it },
+                modifier  = Modifier.fillMaxWidth()
+            ) {
+                // Ini field yang diklik user untuk buka dropdown
+                OutlinedTextField(
+                    value         = viewModel.selectedEntityName,
+                    onValueChange = {},         // read-only — user tidak bisa ketik manual
+                    readOnly      = true,
+                    label         = { Text("Cabang / Lokasi Kerja") },
+                    leadingIcon   = { Icon(Icons.Default.Place, null) },
+                    trailingIcon  = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded)
+                    },
+                    isError       = uiState is LoginUiState.Error
+                            && viewModel.selectedEntityId.isBlank(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true)
+                )
+
+                // Isi dropdown — daftar semua pilihan cabang
+                ExposedDropdownMenu(
+                    expanded  = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false }
+                ) {
+                    viewModel.entityOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text    = { Text(option.name) },
+                            onClick = {
+                                viewModel.onEntitySelected(option)
+                                dropdownExpanded = false
+                            },
+                            // Highlight pilihan yang sedang aktif
+                            leadingIcon = if (viewModel.selectedEntityId == option.id) {
+                                { Icon(Icons.Default.Check, null,
+                                    tint = MaterialTheme.colorScheme.primary) }
+                            } else null
+                        )
+                    }
+                }
+            }
+
             if (uiState is LoginUiState.Error) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(

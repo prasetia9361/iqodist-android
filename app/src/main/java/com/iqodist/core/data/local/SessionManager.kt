@@ -51,4 +51,10 @@ class SessionManager @Inject constructor( @ApplicationContext private val contex
 
     val userName: Flow<String?> = context.dataStore.data
         .map { prefs -> prefs[SessionKeys.USER_NAME] }
+
+    val userId: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[SessionKeys.USER_ID] ?: "" }
+
+    val entityId: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[SessionKeys.ENTITY_ID] ?: ""}
 }

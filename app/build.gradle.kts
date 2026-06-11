@@ -70,6 +70,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation("androidx.compose.material:material-icons-extended")
 
     // ── ROOM ──────────────────────────────────────────────────────────────
     // Bundle: room-runtime + room-ktx
@@ -108,4 +109,8 @@ dependencies {
     androidTestImplementation(libs.bundles.testing.android)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    //QR Scanner
+    implementation(libs.bundles.camera)
+    implementation(libs.accompanist.permissions)
 }

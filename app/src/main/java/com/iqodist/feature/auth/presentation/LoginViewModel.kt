@@ -29,26 +29,41 @@ class LoginViewModel @Inject constructor(
     var isPasswordVisible by mutableStateOf(false)
         private set
 
+    var selectedEntityId by mutableStateOf("0")
+        private set
+
+    var selectedEntityName by mutableStateOf("Pilih Cabang / Lokasi")
+        private set
+
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+    val entityOptions: List<EntityOption> = listOf(
+        EntityOption("HQ", "Head Quarter (HQ)"),
+        EntityOption("Cab_jakarta", "Cabang Jakarta"),
+        EntityOption("cab_surabaya", "Cabang Surabaya"),
+        EntityOption("cab_bandung", "Cabang Bandung"),
+        EntityOption("cab_medan", "Cabang Medan")
+    )
+
     fun onUsernameChange(newValue: String) {
         username = newValue
-
-        if (_uiState.value is LoginUiState.Error){
-            _uiState.value = LoginUiState.Idle
-        }
+        clearErrorIfAny()
     }
 
     fun onPasswordChange(newValue: String){
         password = newValue
-        if (_uiState.value is LoginUiState.Error){
-            _uiState.value = LoginUiState.Idle
-        }
+        clearErrorIfAny()
     }
 
     fun toggelPasswordVisibility(){
         isPasswordVisible = !isPasswordVisible
+    }
+
+    fun onEntitySelected(option: EntityOption){
+        selectedEntityId = option.id
+        selectedEntityName = option.name
+        clearErrorIfAny()
     }
 
     fun login() {
@@ -57,7 +72,11 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
 
-            val result = loginUseCase(username = username.trim(), password = password)
+            val result = loginUseCase(
+                username = username.trim(),
+                password = password,
+                entityId = selectedEntityId
+            )
 
             _uiState.value = result.fold(
                 onSuccess = {role -> LoginUiState.Success(role = role)
@@ -71,7 +90,6 @@ class LoginViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
-
             _uiState.value = LoginUiState.Idle
         }
     }
@@ -79,7 +97,18 @@ class LoginViewModel @Inject constructor(
     fun resetState(){
         _uiState.value = LoginUiState.Idle
     }
+
+    private fun clearErrorIfAny() {
+        if (_uiState.value is LoginUiState.Error) {
+            _uiState.value = LoginUiState.Idle
+        }
+    }
 }
+
+data class EntityOption(
+    val id: String,
+    val name: String
+)
 
 sealed class LoginUiState {
     data object Idle : LoginUiState()

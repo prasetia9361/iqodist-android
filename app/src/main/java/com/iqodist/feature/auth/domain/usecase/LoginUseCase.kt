@@ -10,7 +10,7 @@ class LoginUseCase @Inject constructor(
     suspend operator fun invoke(
         username: String,
         password: String,
-        entityId: String = "HQ"
+        entityId: String
     ): Result<String> {
         if (username.isBlank()) {
             return Result.failure(Exception("username ttidak boleh kosong"))
@@ -23,6 +23,9 @@ class LoginUseCase @Inject constructor(
         }
         if (password.length < 6){
             return Result.failure(Exception("Password minimal 6 karakter"))
+        }
+        if (entityId.isBlank()){
+            return Result.failure(Exception("Cabang/ Lokasi kerja belum dipilih"))
         }
 
         return repository.login(username,password,entityId)
