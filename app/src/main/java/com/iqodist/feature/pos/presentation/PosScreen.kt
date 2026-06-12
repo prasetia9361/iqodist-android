@@ -35,6 +35,8 @@ fun PosScreen(
     val grandTotal    by viewModel.grandTotal.collectAsStateWithLifecycle()
     val checkoutState by viewModel.checkoutState.collectAsStateWithLifecycle()
     val hasAgeRestricted by viewModel.hasAgeRestrictedItem.collectAsStateWithLifecycle()
+    val scanState       by viewModel.scanState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // State lokal — hanya relevan di layar ini
     var showScanner          by remember { mutableStateOf(false) }
@@ -47,6 +49,18 @@ fun PosScreen(
         when (checkoutState) {
             is CheckoutState.NeedAgeVerification -> showAgeVerification = true
             else -> { /* ditangani di bawah */ }
+        }
+    }
+
+    LaunchedEffect(scanState) {
+        if (scanState is ScanState.Found){
+            showScanner = false
+        }
+    }
+
+    LaunchedEffect(showScanner) {
+        if (!showScanner){
+            viewModel.resetScanState()
         }
     }
 
@@ -98,6 +112,7 @@ fun PosScreen(
     }
 
     Scaffold(
+        snackbarHost = {SnackbarHost(snackbarHostState)},
         topBar = {
             TopAppBar(
                 title = { Text("Kasir POS") },
@@ -141,6 +156,12 @@ fun PosScreen(
                         .fillMaxWidth()
                         .height(200.dp)
                 )
+            }
+
+            if (scanState is ScanState.NotFound){
+                LaunchedEffect(scanState) {
+                    snackbarHostState.showSnackbar("Produk tidak ditemukan")
+                }
             }
 
             // ── Daftar Item di Keranjang ─────────────────────────────────

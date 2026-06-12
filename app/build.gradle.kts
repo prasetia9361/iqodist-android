@@ -28,7 +28,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${localProps.getProperty("BASE_URL", "https://api.example.com/")}\""
+            "\"${localProps.getProperty("BASE_URL", "https://apiexample.com/")}\""
         )
     }
 
@@ -70,7 +70,6 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation("androidx.compose.material:material-icons-extended")
 
     // ── ROOM ──────────────────────────────────────────────────────────────
     // Bundle: room-runtime + room-ktx

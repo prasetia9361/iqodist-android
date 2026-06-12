@@ -32,7 +32,7 @@ class SessionManager @Inject constructor( @ApplicationContext private val contex
             prefs[SessionKeys.USER_NAME]     = userName
             prefs[SessionKeys.USER_ROLE]     = userRole
             prefs[SessionKeys.ENTITY_ID]     = entityId
-            prefs[SessionKeys.IS_LOGGED_IN]  = true
+            prefs[SessionKeys.IS_LOGGED_IN]  = false
         }
     }
 
